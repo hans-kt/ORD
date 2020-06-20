@@ -11,7 +11,7 @@ interface UnitInterface {
                         if(containsKey(entry.key)) {
                             put(entry.key, get(entry.key)!! + entry.value)
                         } else {
-                            put(entry.key, 1)
+                            put(entry.key, entry.value)
                         }
                     }
                 }
@@ -22,7 +22,7 @@ interface UnitInterface {
     private fun recursive(unit: UnitInterface): HashMap<String, Int> {
         return HashMap<String,Int>().apply {
             unit.getCombination().list.forEach {
-                if(it !is Common) {
+                if(it !is Common && it !is ETC) {
                     recursive(it).also { map ->
                         map.entries.forEach { entry ->
                             if(containsKey(entry.key)) {

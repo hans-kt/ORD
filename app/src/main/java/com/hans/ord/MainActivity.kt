@@ -58,7 +58,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 UnitGradeBottomSheet(position).apply {
                     itemClickListener = { grade ->
-                        binding.grade = grade.grade
+                        if(binding.grade != grade.grade) {
+                            (binding.searchResult.adapter as SearchResultAdapter).list = emptyList()
+                            binding.grade = grade.grade
+                        }
                     }
                     show(
                         supportFragmentManager,
@@ -75,17 +78,17 @@ class MainActivity : AppCompatActivity() {
             when (gradeText) {
                 UnitGrade.COMMON.grade -> {
                     Common.values().forEach { common ->
-                        if (common.getUnitName().contains(keyword)) list.add(common)
+                        addUnit(common, keyword, list)
                     }
                 }
                 UnitGrade.UNCOMMON.grade -> {
                     UnCommon.values().forEach { uncommon ->
-                        if (uncommon.getUnitName().contains(keyword)) list.add(uncommon)
+                        addUnit(uncommon, keyword, list)
                     }
                 }
                 UnitGrade.RARE.grade -> {
-                    Rare.values().forEach { uncommon ->
-                        if (uncommon.getUnitName().contains(keyword)) list.add(uncommon)
+                    Rare.values().forEach { rare ->
+                        addUnit(rare, keyword, list)
                     }
                 }
             }
@@ -94,6 +97,10 @@ class MainActivity : AppCompatActivity() {
                 notifyDataSetChanged()
             }
         }
+    }
+
+    private fun addUnit(unit: UnitInterface, keyword: String, list: MutableList<UnitInterface>) {
+        if(unit.getUnitName().contains(keyword)) list.add(unit)
     }
 
 
@@ -120,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         fun bind(unit: UnitInterface) {
             itemView.search_result_unit_name.text = unit.getUnitName()
             itemView.setOnClickListener {
-                toast(it.context, unit.getCommonUnitCount().toString())
+                toast(it.context, "${unit.getCombination()}\n${unit.getCommonUnitCount()}")
             }
         }
     }
