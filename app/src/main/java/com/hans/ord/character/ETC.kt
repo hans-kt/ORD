@@ -1,7 +1,8 @@
 package com.hans.ord.character
 
 enum class ETC(private val unitName: String): UnitInterface {
-    ZOMBIE("좀비");
+    ZOMBIE("좀비"),
+    TREE("나무");
 
     override fun getUnitName(): String {
         return unitName

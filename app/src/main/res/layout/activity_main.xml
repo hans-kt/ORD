@@ -6,7 +6,7 @@
     <data>
         <variable
             name="grade"
-            type="String" />
+            type="com.hans.ord.character.UnitGrade" />
         <variable
             name="viewModel"
             type="com.hans.ord.MainViewModel" />
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="@{grade}"
+            android:text="@{grade.grade}"
             android:clickable="true"
             android:focusable="true"
             android:onClick="@{() -> viewModel.onClickSelectGrade(grade)}"

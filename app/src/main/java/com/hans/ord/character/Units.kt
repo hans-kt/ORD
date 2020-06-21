@@ -5,15 +5,17 @@ data class Units(
 ) {
     override fun toString(): String {
         var result = ""
-        list.forEach {
-            result += it.getUnitName() + " "
+        list.forEachIndexed { index, unit ->
+            result += unit.getUnitName() + if(index != list.size - 1) ", " else ""
         }
         return result
     }
 }
 
 enum class UnitGrade(val grade: String) {
+    NO_GRADE("등급선택"),
     COMMON("흔함"),
     UNCOMMON("안흔함"),
-    RARE("특별함")
+    RARE("특별함"),
+    UNIQUE("희귀함")
 }

@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val GRADE_BOTTOM_SHEET_TAG = "grade bottom sheet tag"
-        private const val NO_GRADE = "등급선택"
     }
 
     private val viewModel: MainViewModel by lazy {
@@ -34,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).apply {
             viewModel = this@MainActivity.viewModel
             lifecycleOwner = this@MainActivity
-            grade = NO_GRADE
+            grade = UnitGrade.NO_GRADE
         }.also {
             binding = it
         }
@@ -52,15 +51,15 @@ class MainActivity : AppCompatActivity() {
                 var position: Int? = null
                 val currentGrade = it.getContentIfNotHandled()
                 UnitGrade.values().forEachIndexed { index, grade ->
-                    if (grade.grade == currentGrade) {
+                    if (grade == currentGrade) {
                         position = index
                     }
                 }
                 UnitGradeBottomSheet(position).apply {
                     itemClickListener = { grade ->
-                        if(binding.grade != grade.grade) {
+                        if(binding.grade != grade) {
                             (binding.searchResult.adapter as SearchResultAdapter).list = emptyList()
-                            binding.grade = grade.grade
+                            binding.grade = grade
                         }
                     }
                     show(
@@ -71,25 +70,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewModel.doSearch.observe(this) {
-            val gradeText: String = binding.gradeTxt.text.toString()
+            val grade = binding.grade
             val keyword: String = binding.searchKeyword.text.toString()
             val list = mutableListOf<UnitInterface>()
 
-            when (gradeText) {
-                UnitGrade.COMMON.grade -> {
-                    Common.values().forEach { common ->
-                        addUnit(common, keyword, list)
-                    }
+            when (grade) {
+                UnitGrade.NO_GRADE -> {
+                    addAllGradeUnit(keyword, list)
                 }
-                UnitGrade.UNCOMMON.grade -> {
-                    UnCommon.values().forEach { uncommon ->
-                        addUnit(uncommon, keyword, list)
-                    }
+                UnitGrade.COMMON -> {
+                    addCommonUnit(keyword, list)
                 }
-                UnitGrade.RARE.grade -> {
-                    Rare.values().forEach { rare ->
-                        addUnit(rare, keyword, list)
-                    }
+                UnitGrade.UNCOMMON -> {
+                    addUnCommonUnit(keyword, list)
+                }
+                UnitGrade.RARE -> {
+                    addRareUnit(keyword, list)
+                }
+                UnitGrade.UNIQUE -> {
+                    addUniqueUnit(keyword, list)
+                }
+                else -> {
+
                 }
             }
             (binding.searchResult.adapter as SearchResultAdapter).run {
@@ -99,9 +101,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addUnit(unit: UnitInterface, keyword: String, list: MutableList<UnitInterface>) {
-        if(unit.getUnitName().contains(keyword)) list.add(unit)
+    private fun addAllGradeUnit(keyword: String, list: MutableList<UnitInterface>) {
+        addCommonUnit(keyword, list)
+        addUnCommonUnit(keyword, list)
+        addRareUnit(keyword, list)
+        addUniqueUnit(keyword, list)
     }
+
+    private fun addCommonUnit(keyword: String, list: MutableList<UnitInterface>) {
+        Common.values().forEach { common ->
+            addUnit(common, keyword, list)
+        }
+    }
+    private fun addUnCommonUnit(keyword: String, list: MutableList<UnitInterface>) {
+        UnCommon.values().forEach { unCommon ->
+            addUnit(unCommon, keyword, list)
+        }
+    }
+    private fun addRareUnit(keyword: String, list: MutableList<UnitInterface>) {
+        Rare.values().forEach { rare ->
+            addUnit(rare, keyword, list)
+        }
+    }
+    private fun addUniqueUnit(keyword: String, list: MutableList<UnitInterface>) {
+        Unique.values().forEach { unique ->
+            addUnit(unique, keyword, list)
+        }
+    }
+
+    private fun addUnit(unit: UnitInterface, keyword: String, list: MutableList<UnitInterface>) {
+        takeIf { unit.getUnitName().contains(keyword) }?.let { list.add(unit) }
+    }
+
 
 
     private class SearchResultAdapter : RecyclerView.Adapter<SearchResultViewHolder>() {
